@@ -23,3 +23,9 @@ Click the Dollar icon on the toolbar, it will change the file currently you are 
 
 ## Warnings
 Since the plugin is based on regular expressions, it may cause some unexpected results. It will change all `\(`, `\)`, `\[`, `\]` to `$`, `$`, `$$`, `$$` in the file.
+
+## TODOs
+~~1. 现在使用全局替换后光标会自动移动到文章最上方, 需要修改代码使得光标不会自动移动~~
+~~2. 使用按钮进行替换,如果用户没有手动对文件进行保存,文件会发生丢失,可能需要插件自动保存一下~~
+
+All Fixed!
