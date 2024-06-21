@@ -30,7 +30,8 @@ export default class MyPlugin extends Plugin {
 						new Notice('Math Indicator: No active file view');
 						return;
 					}
-					fileView.save()
+					await fileView.save();
+					
 					let content = await vault.cachedRead(activeLeaf);
 					// 现在 content 是一个 string，可以进行操作
 					content = this.replaceAllParenthesesBrackets(content);
