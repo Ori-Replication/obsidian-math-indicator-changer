@@ -1,5 +1,4 @@
 import { App, Editor, MarkdownView, Modal, Notice, Plugin, PluginSettingTab, Setting, Platform, TFile ,TextFileView} from 'obsidian';
-// Remember to rename these classes and interfaces!
 
 interface MyPluginSettings {
 	mySetting: string;
@@ -11,32 +10,23 @@ const DEFAULT_SETTINGS: MyPluginSettings = {
 
 export default class MyPlugin extends Plugin {
 	settings: MyPluginSettings;
-
 	async onload() {
 		console.log('loading plugin')
 		await this.loadSettings();
-
-		// // This creates an icon in the left ribbon.
 		const ribbonIconEl = this.addRibbonIcon('dollar-sign', 'Change Math Indicator', async (evt: MouseEvent) => {
 			// Called when the user clicks the icon.
 			let activeLeaf = this.app.workspace.getActiveFile();
 			if (activeLeaf) {
 				const vault = this.app.vault;
 				try {
-
-					// 使用 await 等待 Promise 解决
 					let fileView: TextFileView | null = this.app.workspace.getActiveViewOfType(TextFileView);
 					if (!fileView) {
 						new Notice('Math Indicator: No active file view');
 						return;
 					}
 					await fileView.save();
-					
 					let content = await vault.cachedRead(activeLeaf);
-					// 现在 content 是一个 string，可以进行操作
 					content = this.replaceAllParenthesesBrackets(content);
-					// 接下来，你可能需要将修改后的内容写回文件或进行其他操作
-					
 					try {
 						await vault.modify(activeLeaf, content);
 					}
@@ -48,10 +38,7 @@ export default class MyPlugin extends Plugin {
 				}
 			}
 		});
-
 		ribbonIconEl.addClass('my-plugin-ribbon-class');
-
-
 		this.addCommand({
 			id: 'change-math-indicator',
 			name: 'Change math indicator',
@@ -59,7 +46,6 @@ export default class MyPlugin extends Plugin {
 				const cursorPos = editor.getCursor();
 				const scrollInfo = editor.getScrollInfo();
 				const savedScrollTop = scrollInfo.top;
-
 				const selectedText = editor.getSelection();
 				let newContent: string;
 				if (selectedText.length === 0) {
@@ -71,16 +57,12 @@ export default class MyPlugin extends Plugin {
 					editor.replaceSelection(newContent);
 				}
 				setTimeout(() => {
-					// 恢复光标和滚动位置
+					// restore cursor position
 					editor.setCursor(cursorPos);
 					editor.scrollTo(null, savedScrollTop);
 				}, 100);
 			}
 		});
-
-
-
-		// When registering intervals, this function will automatically clear the interval when the plugin is disabled.
 		this.registerInterval(window.setInterval(() => console.log('setInterval'), 5 * 60 * 1000));
 	}
 
@@ -108,8 +90,6 @@ export default class MyPlugin extends Plugin {
 		return newText;
 	}
 
-
-
 	onunload() {
 		console.log('unloading plugin')
 	}
@@ -123,19 +103,4 @@ export default class MyPlugin extends Plugin {
 	}
 }
 
-class SampleModal extends Modal {
-	constructor(app: App) {
-		super(app);
-	}
-
-	onOpen() {
-		const { contentEl } = this;
-		contentEl.setText('Woah!');
-	}
-
-	onClose() {
-		const { contentEl } = this;
-		contentEl.empty();
-	}
-}
 
