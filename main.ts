@@ -1,22 +1,22 @@
 import { App, Editor, MarkdownView, Modal, Notice, Plugin, PluginSettingTab, Setting, Platform, TFile ,TextFileView} from 'obsidian';
 
-interface MyPluginSettings {
+interface MathIndicatorChangerSettings {
 	mySetting: string;
 }
 
-const DEFAULT_SETTINGS: MyPluginSettings = {
+const DEFAULT_SETTINGS: MathIndicatorChangerSettings = {
 	mySetting: 'default'
 }
 
-export default class MyPlugin extends Plugin {
-	settings: MyPluginSettings;
+export default class MathIndicatorChanger extends Plugin {
+	settings: MathIndicatorChangerSettings;
+	
 	async onload() {
-		console.log('loading plugin')
 		await this.loadSettings();
+		
 		const ribbonIconEl = this.addRibbonIcon('dollar-sign', 'Change Math Indicator', async (evt: MouseEvent) => {
-			// Called when the user clicks the icon.
-			let activeLeaf = this.app.workspace.getActiveFile();
-			if (activeLeaf) {
+			let activeFile = this.app.workspace.getActiveFile();
+			if (activeFile) {
 				const vault = this.app.vault;
 				try {
 					let fileView: TextFileView | null = this.app.workspace.getActiveViewOfType(TextFileView);
@@ -25,12 +25,11 @@ export default class MyPlugin extends Plugin {
 						return;
 					}
 					await fileView.save();
-					let content = await vault.cachedRead(activeLeaf);
-					content = this.replaceAllParenthesesBrackets(content);
+					let content = await vault.cachedRead(activeFile);
+					content = this.replaceAllMathIndicators(content);
 					try {
-						await vault.modify(activeLeaf, content);
-					}
-					catch (error) {
+						await vault.modify(activeFile, content);
+					} catch (error) {
 						new Notice('Math Indicator: Error updating file: ' + error);
 					}
 				} catch (error) {
@@ -38,10 +37,11 @@ export default class MyPlugin extends Plugin {
 				}
 			}
 		});
-		ribbonIconEl.addClass('my-plugin-ribbon-class');
+		ribbonIconEl.addClass('math-indicator-changer-ribbon-class');
+		
 		this.addCommand({
 			id: 'change-math-indicator',
-			name: 'Change math indicator',
+			name: 'Change Math Indicator',
 			editorCallback: (editor: Editor) => {
 				const cursorPos = editor.getCursor();
 				const scrollInfo = editor.getScrollInfo();
@@ -50,20 +50,18 @@ export default class MyPlugin extends Plugin {
 				let newContent: string;
 				if (selectedText.length === 0) {
 					new Notice('Math Indicator: No text selected, changing the whole file');
-					newContent = this.replaceAllParenthesesBrackets(editor.getValue());
+					newContent = this.replaceAllMathIndicators(editor.getValue());
 					editor.setValue(newContent);
 				} else {
-					newContent = this.replaceAllParenthesesBrackets(selectedText);
+					newContent = this.replaceAllMathIndicators(selectedText);
 					editor.replaceSelection(newContent);
 				}
 				setTimeout(() => {
-					// restore cursor position
 					editor.setCursor(cursorPos);
 					editor.scrollTo(null, savedScrollTop);
 				}, 100);
 			}
 		});
-		this.registerInterval(window.setInterval(() => console.log('setInterval'), 5 * 60 * 1000));
 	}
 
 	replaceLeftParentheses(text: string): string {
@@ -82,7 +80,7 @@ export default class MyPlugin extends Plugin {
 		return text.replace(/[ \t]*\\\]/g, '$$$$')
 	}
 
-	replaceAllParenthesesBrackets(text: string): string {
+	replaceAllMathIndicators(text: string): string {
 		let newText = this.replaceLeftParentheses(text);
 		newText = this.replaceRightParentheses(newText);
 		newText = this.replaceLeftBrackets(newText);
@@ -91,7 +89,7 @@ export default class MyPlugin extends Plugin {
 	}
 
 	onunload() {
-		console.log('unloading plugin')
+		console.log('unloading Math Indicator Changer plugin');
 	}
 
 	async loadSettings() {
@@ -102,5 +100,3 @@ export default class MyPlugin extends Plugin {
 		await this.saveData(this.settings);
 	}
 }
-
-
