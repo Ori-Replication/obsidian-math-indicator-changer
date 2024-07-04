@@ -1,20 +1,8 @@
 import { App, Editor, MarkdownView, Modal, Notice, Plugin, PluginSettingTab, Setting, Platform, TFile ,TextFileView} from 'obsidian';
 
-interface MathIndicatorChangerSettings {
-	mySetting: string;
-}
-
-const DEFAULT_SETTINGS: MathIndicatorChangerSettings = {
-	mySetting: 'default'
-}
-
 export default class MathIndicatorChanger extends Plugin {
-	settings: MathIndicatorChangerSettings;
-	
 	async onload() {
-		await this.loadSettings();
-		
-		const ribbonIconEl = this.addRibbonIcon('dollar-sign', 'Change Math Indicator', async (evt: MouseEvent) => {
+		const ribbonIconEl = this.addRibbonIcon('dollar-sign', 'Change math indicator', async (evt: MouseEvent) => {
 			let activeFile = this.app.workspace.getActiveFile();
 			if (activeFile) {
 				const vault = this.app.vault;
@@ -90,13 +78,5 @@ export default class MathIndicatorChanger extends Plugin {
 
 	onunload() {
 		console.log('unloading Math Indicator Changer plugin');
-	}
-
-	async loadSettings() {
-		this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
-	}
-
-	async saveSettings() {
-		await this.saveData(this.settings);
 	}
 }
