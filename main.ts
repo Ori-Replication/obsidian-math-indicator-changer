@@ -29,7 +29,7 @@ export default class MathIndicatorChanger extends Plugin {
 		
 		this.addCommand({
 			id: 'change-math-indicator',
-			name: 'Change Math Indicator',
+			name: 'Change math indicator',
 			editorCallback: (editor: Editor) => {
 				const cursorPos = editor.getCursor();
 				const scrollInfo = editor.getScrollInfo();
